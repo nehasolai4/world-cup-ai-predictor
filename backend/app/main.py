@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from fastapi.middleware.cors import CORSMiddleware
 
 
 from app.schemas import MatchRequest
@@ -7,6 +8,15 @@ from app.model_loader import model, team_encoder, target_encoder
 from app.feature_engineering import create_feature_vector
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    
+    allow_credentials=True,
+    allow_methods=["*"],    
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
@@ -58,3 +68,9 @@ def predict(match: MatchRequest):
         "confidence": round(float(max(probabilities)), 3),
         "probabilities": prob_dict
     }
+
+
+
+@app.get("/teams")
+def get_teams():
+    return team_encoder.classes_.tolist()
